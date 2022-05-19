@@ -1,0 +1,70 @@
+service: notifications
+frameworkVersion: '2.28.6'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: ${env:ENVIRONMENT}
+  timeout: 30
+  environment:
+    ENVIRONMENT: ${env:ENVIRONMENT}
+    DB_HOST: ${env:DB_HOST}
+    DB_PORT: ${env:DB_PORT}
+    DB_NAME: ${env:DB_NAME}
+    DB_USER: ${env:DB_USER}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+
+  iam: ${file(./environment/provider.yml):iam}
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-offline-aws-eventbridge
+  - serverless-prune-plugin
+
+custom:
+  serverless-offline:
+    httpPort: 4000
+    useDocker: true
+    dockerNetwork: appnet
+    dockerHost: 127.0.0.1
+  prune:
+    automatic: true
+    number: 3    
+
+package:
+  individually: true
+  exclude:
+    - ./.git/**
+    - ./.serverless/**
+    - ./node_modules/**
+    - ./pkg/**
+    - ./bootstrap/**
+    - ./cmd/**
+    - ./.dockers/**
+    - ./.githooks/**
+    - ./bin/**
+
+functions:
+  notifications-create:
+    description: Create a new notification
+    handler: bin/notification-create
+    events:
+      - http:
+          path: /notifications
+          method: post
+          cors: true
+    package:
+      include:
+        - ./bin/notification-create
+  notifications-getall:
+    description:  Get all notifications  
+    handler: bin/notification-create
+    events:
+      - http:
+          path: /notifications
+          method: get
+          cors: true
+    package:
+      include:
+        - ./bin/notification-create

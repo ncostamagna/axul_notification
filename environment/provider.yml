@@ -1,0 +1,13 @@
+# Role for Serverless functions deployment
+iam:
+  role: ${env:AWS_DEPLOY_ROLE}
+# AWS VPC parameters
+vpc:
+  securityGroupIds:
+    - ${env:AWS_SG}
+  subnetIds:
+    - ${env:AWS_SUBNET_1}
+    - ${env:AWS_SUBNET_2}
+    - ${env:AWS_SUBNET_3}
+tracing:
+  lambda: true
