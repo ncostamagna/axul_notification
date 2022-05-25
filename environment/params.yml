@@ -1,0 +1,26 @@
+default:
+  vertical: gbl
+  service: notifications
+  #aws
+  aws-bucket-name: gbl-axul-serverless
+  aws-memory-size: 256
+  aws-tracing-apigateway: false
+  aws-tracing-lambda: false
+  aws-version-function: false
+  aws-region: us-east-1
+prod:
+  environment: prod
+  aws-log-retention: 180
+  datadog-enabled: true
+  sentry-enabled: true
+qa:
+  environment: qa
+  aws-log-retention: 30
+  datadog-enabled: true
+  sentry-enabled: true
+dev:
+  environment: dev
+  aws-log-retention: 7
+local:
+  environment: local
+  aws-log-retention: 7

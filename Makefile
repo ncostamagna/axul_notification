@@ -10,8 +10,8 @@ install:
 	go mod download
 
 build:
-	env GOOS=linux go build -ldflags="-s -w" -o bin/notification-getall 		    		cmd/notification/getall/main.go
-	env GOOS=linux go build -ldflags="-s -w" -o bin/notification-create		    		cmd/notification/getall/main.go
+	env GOOS=linux go build -ldflags="-s -w" -o bin/notification-getall 	cmd/notification/getall/main.go
+	env GOOS=linux go build -ldflags="-s -w" -o bin/notification-create		cmd/notification/create/main.go
 
 start:
 	make build

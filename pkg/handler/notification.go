@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/digitalhouse-dev/dh-kit/request"
@@ -20,22 +21,27 @@ func NewLambdaNotificationGetAll(endpoints notification.Endpoints) *awslambda.Ha
 		HandlerErrorEncoder(nil), awslambda.HandlerFinalizer(HandlerFinalizer(nil)))
 }
 
+func NewLambdaNotificationCreate(endpoints notification.Endpoints) *awslambda.Handler {
+	return awslambda.NewHandler(endpoint.Endpoint(endpoints.Create), decodeCreateRequestHandler, EncodeResponse,
+		HandlerErrorEncoder(nil), awslambda.HandlerFinalizer(HandlerFinalizer(nil)))
+}
+
 func decodeGetAllHandler(_ context.Context, payload []byte) (interface{}, error) {
 	var event events.APIGatewayProxyRequest
 	if err := json.Unmarshal(payload, &event); err != nil {
-		return nil, response.InternalServerError("")
+		return nil, response.InternalServerError(err.Error())
 	}
 
 	var req notification.GetAllRequest
 
 	err := request.DecodeMap(event.QueryStringParameters, &req)
 	if err != nil {
-		return nil, err
+		return nil, response.InternalServerError(err.Error())
 	}
 	return req, nil
 }
 
-func decodeProdUserStoreRequestHandler(_ context.Context, payload []byte) (interface{}, error) {
+func decodeCreateRequestHandler(_ context.Context, payload []byte) (interface{}, error) {
 	var gateway events.APIGatewayProxyRequest
 	err := json.Unmarshal(payload, &gateway)
 	if err != nil {
@@ -58,11 +64,16 @@ func decodeProdUserStoreRequestHandler(_ context.Context, payload []byte) (inter
 		return nil, response.BadRequest("")
 	}
 
-	var res notification.GetAllRequest
+	var res notification.CreateRequest
 	err = json.Unmarshal([]byte(body), &res)
 	if err != nil {
 		return nil, err
 	}
+
+	if err := request.DecodeMap(gateway.QueryStringParameters, &res); err != nil {
+		return nil, response.InternalServerError(err.Error())
+	}
+	fmt.Println(res)
 	return res, nil
 }
 
